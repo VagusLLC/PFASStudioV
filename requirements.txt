@@ -1,0 +1,4 @@
+pymongo
+stmol
+plotly
+gridfs
