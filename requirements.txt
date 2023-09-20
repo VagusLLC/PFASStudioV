@@ -1,4 +1,0 @@
-pymongo
-stmol
-plotly
-gridfs
