@@ -656,59 +656,62 @@ with cc1:
             """
         st.components.v1.html(html1, height = 450)
     with local_mode_tab:
-        cols = ["Mode"]
-        # list(map(lambda x: cols.append(x), tensor_props[index]["local [modes]"]))
-        # st.write(cols)
-        df = pd.DataFrame(columns=["Normal Mode", "Local Mode", "Contribution"])
-        for i,freq in enumerate(tensor_props[index]["Frequency [cm⁻¹]"]): 
-            for j, mode in enumerate(tensor_props[index]["local [modes]"]):
-                df.loc[-1] = [freq] + [mode] + [tensor_props[index]["local [contributions]"][i][j]]
-                df.index = df.index+1
-        # st.write(df)
-        fig_bar = px.bar(df, x = "Normal Mode", color = "Local Mode", y = "Contribution", barmode='stack')
-        # Update ylabel in fig_bar to say "Contribution [%]"
-        fig_bar.update_yaxes(title_text="Contribution [%]")
-        fig_bar.update_xaxes(title_text="Frequency [cm⁻¹]")
-        fig_bar.update_layout(
-            coloraxis_colorbar = dict(
-                title = "Local Mode",
+        try:
+            cols = ["Mode"]
+            # list(map(lambda x: cols.append(x), tensor_props[index]["local [modes]"]))
+            # st.write(cols)
+            df = pd.DataFrame(columns=["Normal Mode", "Local Mode", "Contribution"])
+            for i,freq in enumerate(tensor_props[index]["Frequency [cm⁻¹]"]): 
+                for j, mode in enumerate(tensor_props[index]["local [modes]"]):
+                    df.loc[-1] = [freq] + [mode] + [tensor_props[index]["local [contributions]"][i][j]]
+                    df.index = df.index+1
+            # st.write(df)
+            fig_bar = px.bar(df, x = "Normal Mode", color = "Local Mode", y = "Contribution", barmode='stack')
+            # Update ylabel in fig_bar to say "Contribution [%]"
+            fig_bar.update_yaxes(title_text="Contribution [%]")
+            fig_bar.update_xaxes(title_text="Frequency [cm⁻¹]")
+            fig_bar.update_layout(
+                coloraxis_colorbar = dict(
+                    title = "Local Mode",
+                )
             )
-        )
-        st.plotly_chart(fig_bar, use_container_width=True)
-        html = """
-                <script src="https://3Dmol.org/build/3Dmol-min.js"></script>                     
-                <style>
-                    .mol-container {
-                    width: 100%;
-                    height: 400px;
-                    position: relative;
-                    }
-                </style>
-                <div id="container-02" class="mol-container"></div>
-                <script>
-                    let element = 'container-02';
-                    let config = {};
-                    let labelSpec = {
-                        backgroundColor:"white",
-                        fontColor:"black",
-                        backgroundOpacity:0.75,
-                        inFront:true,
-                    };
-                    let v = $3Dmol.createViewer( element, config );
-                    var m = v.addModel(`"""+pdb.decode("utf-8")+"""`, "pdb", {keepH:true, assignBonds:true});
-                    """+''.join(list(map(lambda i: f"""v.addLabel("{i[0]+1}", labelSpec, {{index: {i[0]}}});""", enumerate(tensor_props[index]["[atoms]"]))))+"""
-                    v.setBackgroundColor(0xffffff, 0.0);
-                    v.setStyle({},{cartoon:{}, sphere:{scale:0.25, colorscheme:'Jmol'}, stick:{radius:0.15, colorscheme:'Jmol'}});
-                        v.vibrate(10, 1);
-                        v.animate({loop: "forward",reps: 1});
-                        v.zoomTo();                                      /* set camera */
-                        v.render();                                      /* render scene */
-                </script>"""
-        st.components.v1.html(html, height = 425)
-        # {y[1]: {x[0]: x[1] for x in zip(tensor_props[index]["local [modes]"], tensor_props[index]["local [contributions]"][y[0]])} for y in enumerate(tensor_props[index]["Frequency [cm⁻¹]"])}
-        # st.write(sum(tensor_props[index]["local [contributions]"][1]))
-        # tensor_props[index]["local [modes]"]
-        # tensor_props[index]["Frequency [cm⁻¹]"]
+            st.plotly_chart(fig_bar, use_container_width=True)
+            html = """
+                    <script src="https://3Dmol.org/build/3Dmol-min.js"></script>                     
+                    <style>
+                        .mol-container {
+                        width: 100%;
+                        height: 400px;
+                        position: relative;
+                        }
+                    </style>
+                    <div id="container-02" class="mol-container"></div>
+                    <script>
+                        let element = 'container-02';
+                        let config = {};
+                        let labelSpec = {
+                            backgroundColor:"white",
+                            fontColor:"black",
+                            backgroundOpacity:0.75,
+                            inFront:true,
+                        };
+                        let v = $3Dmol.createViewer( element, config );
+                        var m = v.addModel(`"""+pdb.decode("utf-8")+"""`, "pdb", {keepH:true, assignBonds:true});
+                        """+''.join(list(map(lambda i: f"""v.addLabel("{i[0]+1}", labelSpec, {{index: {i[0]}}});""", enumerate(tensor_props[index]["[atoms]"]))))+"""
+                        v.setBackgroundColor(0xffffff, 0.0);
+                        v.setStyle({},{cartoon:{}, sphere:{scale:0.25, colorscheme:'Jmol'}, stick:{radius:0.15, colorscheme:'Jmol'}});
+                            v.vibrate(10, 1);
+                            v.animate({loop: "forward",reps: 1});
+                            v.zoomTo();                                      /* set camera */
+                            v.render();                                      /* render scene */
+                    </script>"""
+            st.components.v1.html(html, height = 425)
+        except:
+            st.write("Due to current limitations, molecules with aromatic rings are not included in the local mode analysis.")
+            # {y[1]: {x[0]: x[1] for x in zip(tensor_props[index]["local [modes]"], tensor_props[index]["local [contributions]"][y[0]])} for y in enumerate(tensor_props[index]["Frequency [cm⁻¹]"])}
+            # st.write(sum(tensor_props[index]["local [contributions]"][1]))
+            # tensor_props[index]["local [modes]"]
+            # tensor_props[index]["Frequency [cm⁻¹]"]
 with cc2:
     df = pd.DataFrame({"Property": mol_props.keys(), "Value": mol_props.values()})
     df.loc[-1] = ["CASRN", casrn]
