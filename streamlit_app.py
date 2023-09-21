@@ -11,7 +11,6 @@ import zlib
 import pandas as pd
 from bson.objectid import ObjectId
 from streamlit_plotly_events import plotly_events
-from st_speckmol import speck_plot
 import rdkit.Chem as Chem
 from rdkit.Chem import AllChem
 from rdkit import DataStructs
